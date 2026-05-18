@@ -1,0 +1,44 @@
+<div class="min-h-screen bg-[#F8F9FB] px-4 py-10 sm:px-6 lg:px-10">
+  <div class="mx-auto max-w-[720px]">
+    <a [routerLink]="dashboardLink" class="mb-8 inline-flex items-center gap-2 text-sm font-medium text-[#606078] hover:text-[#0D0D14]">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>
+      Back to dashboard
+    </a>
+
+    <div class="rounded-[24px] border border-[#EBEBF0] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:p-8">
+      <div class="mb-8">
+        <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-accent">Settings</div>
+        <h1 class="mt-3 text-[1.75rem] font-display font-extrabold tracking-[-0.03em] text-[#0D0D14]">Account settings</h1>
+        <p class="mt-2 text-sm leading-7 text-[#606078]">Manage your profile basics and security preferences. More settings will be added as the product grows.</p>
+      </div>
+
+      <div class="space-y-6">
+        <div class="rounded-[24px] border border-[#EBEBF0] bg-[#FAFAFA] p-6">
+          <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-accent">Profile</div>
+          <div class="mt-4 text-sm text-[#606078]">
+            <div class="mb-3 text-sm font-semibold text-[#0D0D14]">Full name</div>
+            <div>{{ fullName }}</div>
+          </div>
+          <div class="text-sm text-[#606078]">
+            <div class="mb-3 text-sm font-semibold text-[#0D0D14]">Role</div>
+            <div>{{ role }}</div>
+          </div>
+        </div>
+
+        <div class="rounded-[24px] border border-[#EBEBF0] bg-[#FAFAFA] p-6">
+          <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-accent">Security</div>
+          <div class="mt-4 text-sm leading-7 text-[#606078]">Password management will be available once the backend endpoint is ready.</div>
+        </div>
+
+        <div class="rounded-[24px] border border-[#EBEBF0] bg-[#FAFAFA] p-6">
+          <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-accent">Notifications</div>
+          <div class="mt-4 text-sm leading-7 text-[#606078]">Notification preferences will be added here in a future iteration.</div>
+        </div>
+
+        <button type="button" (click)="logout()" class="w-full rounded-full border border-[#DDDDE8] bg-white px-4 py-3 text-sm font-medium text-[#3C3C50] transition hover:border-[#AEAEC4] hover:bg-[#F7F7FB]">
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

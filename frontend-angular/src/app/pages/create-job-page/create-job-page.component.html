@@ -1,0 +1,78 @@
+<div class="min-h-screen bg-[#F8F9FB] px-4 py-10 sm:px-6 lg:px-10">
+  <div class="mx-auto max-w-[640px]">
+    <a routerLink="/recruiter" class="mb-8 inline-flex items-center gap-2 text-sm font-medium text-[#606078] hover:text-[#0D0D14]">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>
+      Back to dashboard
+    </a>
+
+    <div class="rounded-[24px] border border-[#EBEBF0] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:p-8">
+      <div class="mb-8">
+        <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-accent">New position</div>
+        <h1 class="font-display mt-3 text-[1.75rem] font-extrabold tracking-[-0.03em] text-[#0D0D14]">Post a Job</h1>
+        <p class="mt-2 text-sm leading-7 text-[#606078]">Fill in the job details. Required skills help the AI rank candidates.</p>
+      </div>
+
+      <form class="space-y-5" (ngSubmit)="submit()">
+        <div>
+          <label class="mb-2 block text-sm font-medium text-[#3C3C50]" for="job-title">Job Title</label>
+          <input id="job-title" type="text" name="title" [(ngModel)]="title"
+            class="w-full rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent"
+            placeholder="e.g. Senior Java Developer" required />
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-medium text-[#3C3C50]" for="job-company">Company</label>
+          <input id="job-company" type="text" name="company" [(ngModel)]="company"
+            class="w-full rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent"
+            placeholder="e.g. Acme Corp" required />
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-medium text-[#3C3C50]" for="job-skills">
+            Required Skills
+            <span class="ml-1 font-normal text-[#9898A8]">(comma-separated)</span>
+          </label>
+          <input id="job-skills" type="text" name="skillsInput" [(ngModel)]="skillsInput"
+            class="w-full rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent"
+            placeholder="e.g. Java, Spring Boot, PostgreSQL" />
+          @if (parsedSkills.length > 0) {
+            <div class="mt-2 flex flex-wrap gap-1.5">
+              @for (skill of parsedSkills; track skill) {
+                <span class="rounded-full border border-[#E0DFFF] bg-[#F5F3FF] px-2.5 py-1 text-[11px] font-medium text-accent">{{ skill }}</span>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="mb-2 block text-sm font-medium text-[#3C3C50]" for="job-exp">Min. Experience (years)</label>
+            <input id="job-exp" type="number" name="minimumExperienceYears" [(ngModel)]="minimumExperienceYears"
+              class="w-full rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent"
+              placeholder="0" min="0" max="30" />
+          </div>
+
+          <div>
+            <label class="mb-2 block text-sm font-medium text-[#3C3C50]" for="job-edu">Education Level</label>
+            <select id="job-edu" name="educationLevel" [(ngModel)]="educationLevel"
+              class="w-full rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent">
+              @for (option of educationOptions; track option) {
+                <option [value]="option">{{ option }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        @if (error()) {
+          <div class="rounded-2xl border border-[#F3D3D3] bg-[#FFF5F5] px-4 py-3 text-sm text-[#B42318]">{{ error() }}</div>
+        }
+
+        <button type="submit"
+          class="w-full rounded-full bg-accent px-5 py-3 text-sm font-semibold text-white transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-70"
+          [disabled]="isSubmitting()">
+          {{ isSubmitting() ? 'Posting...' : 'Post Job' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

@@ -32,6 +32,12 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly apiUrl = 'http://localhost:8080/api/auth';
+
+  // Temporary developer bypass for previewing the protected frontend.
+  // Set to false to restore normal login behavior.
+  private readonly DEV_AUTH_BYPASS = true;
+  private readonly DEV_AUTH_ROLE: UserRole = 'CANDIDATE';
+
   private readonly session = signal<AuthResponse | null>(this.readSession());
 
   login(payload: LoginPayload): Observable<AuthResponse> {
@@ -97,14 +103,24 @@ export class AuthService {
     const rawValue = localStorage.getItem('smartHireAuth');
 
     if (!rawValue) {
-      return null;
+      return this.DEV_AUTH_BYPASS ? this.createDevSession() : null;
     }
 
     try {
       return JSON.parse(rawValue) as AuthResponse;
     } catch {
       localStorage.removeItem('smartHireAuth');
-      return null;
+      return this.DEV_AUTH_BYPASS ? this.createDevSession() : null;
     }
+  }
+
+  private createDevSession(): AuthResponse {
+    return {
+      token: 'dev-bypass-token',
+      type: 'Bearer',
+      email: 'dev@smarthireai.local',
+      fullName: 'Dev User',
+      role: this.DEV_AUTH_ROLE
+    };
   }
 }

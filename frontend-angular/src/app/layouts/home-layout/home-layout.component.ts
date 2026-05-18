@@ -17,13 +17,15 @@ export class HomeLayoutComponent {
   readonly navItems = [
     { href: '#features', label: 'Features' },
     { href: '#workflow', label: 'Workflow' },
-    { href: '#impact', label: 'Impact' }
+    { href: '#impact', label: 'Impact' },
+    { href: '/jobs', routerLink: '/jobs', label: 'Jobs' }
   ];
 
   readonly bottomNavItems = [
     { id: 'home', href: '#', label: 'Home' },
     { id: 'features', href: '#features', label: 'Features' },
     { id: 'workflow', href: '#workflow', label: 'Workflow' },
+    { id: 'jobs', href: '/jobs', routerLink: '/jobs', label: 'Jobs' },
     { id: 'impact', href: '#impact', label: 'Impact' }
   ];
 
