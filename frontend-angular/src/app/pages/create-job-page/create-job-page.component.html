@@ -1,40 +1,145 @@
 <div class="min-h-screen bg-[#F8F9FB] px-4 py-10 sm:px-6 lg:px-10">
-  <div class="mx-auto max-w-[640px]">
-    <a routerLink="/recruiter" class="mb-8 inline-flex items-center gap-2 text-sm font-medium text-[#606078] hover:text-[#0D0D14]">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>
-      Back to dashboard
-    </a>
+  @if (showCreationChoice()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-[#0D0D14]/45 px-4 backdrop-blur-sm">
+      <div class="w-full max-w-[560px] rounded-[24px] border border-[#EBEBF0] bg-white p-6 shadow-[0_24px_80px_rgba(13,13,20,0.22)]">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-accent">Create job</div>
+            <h2 class="font-display mt-3 text-[1.6rem] font-extrabold text-[#0D0D14]">How do you want to start?</h2>
+            <p class="mt-2 text-sm leading-6 text-[#606078]">Use the classic form, or try the recruiter AI chatbot preview to shape the posting first.</p>
+          </div>
+          <a routerLink="/recruiter" class="rounded-full border border-[#DDDDE8] px-3 py-1.5 text-[12px] font-semibold text-[#606078] hover:bg-[#F7F7FB]">Cancel</a>
+        </div>
+
+        <div class="mt-6 grid gap-3 sm:grid-cols-2">
+          <button type="button" (click)="useForm()" class="rounded-[18px] border border-[#DDDDE8] bg-white p-4 text-left transition hover:border-accent hover:bg-[#FBFAFF]">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F0EEFF] text-accent">
+              <svg width="19" height="19" viewBox="0 0 19 19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h9a2 2 0 0 1 2 2v11H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M7 7h6M7 10h6M7 13h3"/></svg>
+            </div>
+            <div class="mt-4 font-display text-[15px] font-bold text-[#0D0D14]">Use form</div>
+            <div class="mt-1 text-[12px] leading-5 text-[#606078]">Manually enter each job detail and publish immediately.</div>
+          </button>
+
+          <button type="button" (click)="useChatbot()" class="rounded-[18px] border border-[#C7C5F8] bg-[#FBFAFF] p-4 text-left transition hover:border-accent hover:bg-[#F5F3FF]">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-white">
+              <svg width="19" height="19" viewBox="0 0 19 19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 2h4A3.5 3.5 0 0 1 15 5.5v4A3.5 3.5 0 0 1 11.5 13H9l-4 3v-3.2A3.5 3.5 0 0 1 2 9.5v-4Z"/><path d="M7 7h5M7 10h3"/></svg>
+            </div>
+            <div class="mt-4 font-display text-[15px] font-bold text-[#0D0D14]">Try AI chatbot</div>
+            <div class="mt-1 text-[12px] leading-5 text-[#606078]">Preview a guided recruiter assistant before backend AI is connected.</div>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="mx-auto max-w-[980px]">
+    <div class="mb-8 flex items-center justify-between gap-4">
+      <a routerLink="/recruiter" class="inline-flex items-center gap-2 text-sm font-medium text-[#606078] hover:text-[#0D0D14]">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>
+        Back to dashboard
+      </a>
+      <button type="button" (click)="reopenChoice()" class="rounded-full border border-[#DDDDE8] bg-white px-4 py-2 text-[12px] font-semibold text-[#3C3C50] transition hover:bg-[#F7F7FB]">
+        Change start method
+      </button>
+    </div>
+
+    @if (creationMode() === 'chat') {
+      <section class="mb-6 rounded-[24px] border border-[#D9D7FF] bg-[#FBFAFF] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-stretch">
+          <div class="lg:w-[320px]">
+            <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-accent">AI recruiter assistant</div>
+            <h2 class="font-display mt-2 text-xl font-extrabold text-[#0D0D14]">Draft with chat</h2>
+            <p class="mt-2 text-sm leading-6 text-[#606078]">This is a front-end preview. The assistant interaction is local UI only until the AI backend is added.</p>
+          </div>
+
+          <div class="flex min-h-[260px] flex-1 flex-col rounded-[18px] border border-[#EBEBF0] bg-white">
+            <div class="flex-1 space-y-3 overflow-y-auto p-4">
+              @for (message of chatMessages(); track $index) {
+                <div class="flex" [class.justify-end]="message.role === 'recruiter'">
+                  <div class="max-w-[82%] rounded-2xl px-4 py-2.5 text-sm leading-6"
+                    [class.bg-accent]="message.role === 'recruiter'"
+                    [class.text-white]="message.role === 'recruiter'"
+                    [class.bg-[#F3F4F8]]="message.role !== 'recruiter'"
+                    [class.text-[#3C3C50]]="message.role !== 'recruiter'">
+                    {{ message.text }}
+                  </div>
+                </div>
+              }
+            </div>
+            <form class="flex gap-2 border-t border-[#EBEBF0] p-3" (ngSubmit)="sendChatMessage()">
+              <input type="text" name="chatInput" [(ngModel)]="chatInput"
+                class="min-w-0 flex-1 rounded-full border border-[#E5E7EB] bg-white px-4 py-2.5 text-sm text-[#0D0D14] outline-none transition focus:border-accent"
+                placeholder="e.g. Senior Angular role, remote, 5 years, TypeScript..." />
+              <button type="submit" class="rounded-full bg-accent px-4 py-2 text-[13px] font-semibold text-white transition hover:bg-accent-strong">Send</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    }
 
     <div class="rounded-[24px] border border-[#EBEBF0] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)] sm:p-8">
       <div class="mb-8">
         <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-accent">New position</div>
-        <h1 class="font-display mt-3 text-[1.75rem] font-extrabold tracking-[-0.03em] text-[#0D0D14]">Post a Job</h1>
+        <h1 class="font-display mt-3 text-[1.75rem] font-extrabold text-[#0D0D14]">Post a Job</h1>
         <p class="mt-2 text-sm leading-7 text-[#606078]">Fill in the job details. Required skills help the AI rank candidates.</p>
       </div>
 
       <form class="space-y-5" data-testid="create-job-form" (ngSubmit)="submit()">
-        <div>
-          <label class="mb-2 block text-sm font-medium text-[#3C3C50]" for="job-title">Job Title</label>
-          <input id="job-title" type="text" name="title" data-testid="job-title-input" [(ngModel)]="title"
-            class="w-full rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent"
-            placeholder="e.g. Senior Java Developer" required />
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="mb-2 flex items-center justify-between gap-2 text-sm font-medium text-[#3C3C50]" for="job-title">
+              <span>Job Title</span>
+              <span class="rounded-full bg-[#F0EEFF] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-accent">Required</span>
+            </label>
+            <input id="job-title" type="text" name="title" data-testid="job-title-input" [(ngModel)]="title"
+              class="w-full rounded-2xl border border-[#C7C5F8] bg-[#FBFAFF] px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent"
+              placeholder="e.g. Senior Java Developer" required />
+          </div>
+
+          <div>
+            <label class="mb-2 flex items-center justify-between gap-2 text-sm font-medium text-[#3C3C50]" for="job-company">
+              <span>Company</span>
+              <span class="rounded-full bg-[#F0EEFF] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-accent">Required</span>
+            </label>
+            <input id="job-company" type="text" name="company" data-testid="job-company-input" [(ngModel)]="company"
+              class="w-full rounded-2xl border border-[#C7C5F8] bg-[#FBFAFF] px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent"
+              placeholder="e.g. Acme Corp" required />
+          </div>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="mb-2 flex items-center justify-between gap-2 text-sm font-medium text-[#3C3C50]" for="job-location">
+              <span>Location</span>
+              <span class="text-[11px] font-medium text-[#9898A8]">Optional</span>
+            </label>
+            <input id="job-location" type="text" name="location" [(ngModel)]="location"
+              class="w-full rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent"
+              placeholder="e.g. Casablanca, Morocco" />
+          </div>
+
+          <div>
+            <label class="mb-2 flex items-center justify-between gap-2 text-sm font-medium text-[#3C3C50]" for="job-department">
+              <span>Department</span>
+              <span class="text-[11px] font-medium text-[#9898A8]">Optional</span>
+            </label>
+            <input id="job-department" type="text" name="department" [(ngModel)]="department"
+              class="w-full rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent"
+              placeholder="e.g. Engineering" />
+          </div>
         </div>
 
         <div>
-          <label class="mb-2 block text-sm font-medium text-[#3C3C50]" for="job-company">Company</label>
-          <input id="job-company" type="text" name="company" data-testid="job-company-input" [(ngModel)]="company"
-            class="w-full rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent"
-            placeholder="e.g. Acme Corp" required />
-        </div>
-
-        <div>
-          <label class="mb-2 block text-sm font-medium text-[#3C3C50]" for="job-skills">
-            Required Skills
-            <span class="ml-1 font-normal text-[#9898A8]">(comma-separated)</span>
+          <label class="mb-2 flex items-center justify-between gap-2 text-sm font-medium text-[#3C3C50]" for="job-skills">
+            <span>
+              Required Skills
+              <span class="ml-1 font-normal text-[#9898A8]">(comma-separated)</span>
+            </span>
+            <span class="rounded-full bg-[#F0EEFF] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-accent">Required</span>
           </label>
           <input id="job-skills" type="text" name="skillsInput" data-testid="job-skills-input" [(ngModel)]="skillsInput"
-            class="w-full rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent"
-            placeholder="e.g. Java, Spring Boot, PostgreSQL" />
+            class="w-full rounded-2xl border border-[#C7C5F8] bg-[#FBFAFF] px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent"
+            placeholder="e.g. Java, Spring Boot, PostgreSQL" required />
           @if (parsedSkills.length > 0) {
             <div class="mt-2 flex flex-wrap gap-1.5">
               @for (skill of parsedSkills; track skill) {
@@ -44,22 +149,88 @@
           }
         </div>
 
-        <div class="grid gap-4 sm:grid-cols-2">
+        <div class="grid gap-4 sm:grid-cols-3">
           <div>
-            <label class="mb-2 block text-sm font-medium text-[#3C3C50]" for="job-exp">Min. Experience (years)</label>
+            <label class="mb-2 flex items-center justify-between gap-2 text-sm font-medium text-[#3C3C50]" for="job-exp">
+              <span>Min. Experience</span>
+              <span class="text-[11px] font-medium text-[#9898A8]">Optional</span>
+            </label>
             <input id="job-exp" type="number" name="minimumExperienceYears" data-testid="job-experience-input" [(ngModel)]="minimumExperienceYears"
               class="w-full rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent"
               placeholder="0" min="0" max="30" />
           </div>
 
           <div>
-            <label class="mb-2 block text-sm font-medium text-[#3C3C50]" for="job-edu">Education Level</label>
+            <label class="mb-2 flex items-center justify-between gap-2 text-sm font-medium text-[#3C3C50]" for="job-edu">
+              <span>Education Level</span>
+              <span class="text-[11px] font-medium text-[#9898A8]">Optional</span>
+            </label>
             <select id="job-edu" name="educationLevel" data-testid="job-education-select" [(ngModel)]="educationLevel"
               class="w-full rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent">
               @for (option of educationOptions; track option) {
                 <option [value]="option">{{ option }}</option>
               }
             </select>
+          </div>
+
+          <div>
+            <label class="mb-2 flex items-center justify-between gap-2 text-sm font-medium text-[#3C3C50]" for="job-status">
+              <span>Status</span>
+              <span class="text-[11px] font-medium text-[#9898A8]">Optional</span>
+            </label>
+            <select id="job-status" name="status" [(ngModel)]="status"
+              class="w-full rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent">
+              @for (option of statusOptions; track option) {
+                <option [value]="option">{{ option }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <label class="mb-2 flex items-center justify-between gap-2 text-sm font-medium text-[#3C3C50]" for="job-type">
+              <span>Employment Type</span>
+              <span class="text-[11px] font-medium text-[#9898A8]">Optional</span>
+            </label>
+            <select id="job-type" name="employmentType" [(ngModel)]="employmentType"
+              class="w-full rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent">
+              @for (option of employmentTypeOptions; track option) {
+                <option [value]="option">{{ option }}</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="mb-2 flex items-center justify-between gap-2 text-sm font-medium text-[#3C3C50]" for="job-work-mode">
+              <span>Work Mode</span>
+              <span class="text-[11px] font-medium text-[#9898A8]">Optional</span>
+            </label>
+            <select id="job-work-mode" name="workMode" [(ngModel)]="workMode"
+              class="w-full rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent">
+              @for (option of workModeOptions; track option) {
+                <option [value]="option">{{ option }}</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="mb-2 flex items-center justify-between gap-2 text-sm font-medium text-[#3C3C50]" for="job-salary">
+              <span>Salary Range</span>
+              <span class="text-[11px] font-medium text-[#9898A8]">Optional</span>
+            </label>
+            <input id="job-salary" type="text" name="salaryRange" [(ngModel)]="salaryRange"
+              class="w-full rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent"
+              placeholder="$45k - $65k" />
+          </div>
+
+          <div>
+            <label class="mb-2 flex items-center justify-between gap-2 text-sm font-medium text-[#3C3C50]" for="job-deadline">
+              <span>Deadline</span>
+              <span class="text-[11px] font-medium text-[#9898A8]">Optional</span>
+            </label>
+            <input id="job-deadline" type="date" name="applicationDeadline" [(ngModel)]="applicationDeadline"
+              class="w-full rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 text-sm text-[#0D0D14] outline-none transition focus:border-accent" />
           </div>
         </div>
 

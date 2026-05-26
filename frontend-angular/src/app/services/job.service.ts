@@ -10,6 +10,13 @@ export interface Job {
   requiredSkills: string[];
   minimumExperienceYears: number;
   educationLevel: string;
+  location: string;
+  department: string;
+  employmentType: string;
+  workMode: string;
+  salaryRange: string;
+  applicationDeadline: string;
+  status: string;
 }
 
 export interface CreateJobPayload {
@@ -18,6 +25,13 @@ export interface CreateJobPayload {
   requiredSkills: string[];
   minimumExperienceYears: number;
   educationLevel: string;
+  location: string;
+  department: string;
+  employmentType: string;
+  workMode: string;
+  salaryRange: string;
+  applicationDeadline: string | null;
+  status: string;
 }
 
 @Injectable({
