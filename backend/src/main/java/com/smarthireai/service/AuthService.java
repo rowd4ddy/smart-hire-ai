@@ -3,8 +3,9 @@ package com.smarthireai.service;
 import com.smarthireai.dto.AuthResponse;
 import com.smarthireai.dto.LoginRequest;
 import com.smarthireai.dto.RegisterRequest;
-import com.smarthireai.entity.AppUser;
-import com.smarthireai.repository.AppUserRepository;
+import com.smarthireai.entity.Role;
+import com.smarthireai.entity.User;
+import com.smarthireai.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,16 +14,16 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class AuthService {
 
-    private final AppUserRepository appUserRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
     public AuthService(
-            AppUserRepository appUserRepository,
+            UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService
     ) {
-        this.appUserRepository = appUserRepository;
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
     }
@@ -32,18 +33,18 @@ public class AuthService {
 
         String email = normalizeEmail(request.email());
 
-        if (appUserRepository.existsByEmail(email)) {
+        if (userRepository.existsByEmail(email)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }
 
-        AppUser user = new AppUser(
-                request.fullName().trim(),
+        User user = new User(
                 email,
                 passwordEncoder.encode(request.password()),
-                request.role()
+                request.fullName().trim(),
+                User.UserRole.valueOf(request.role().name())
         );
 
-        AppUser savedUser = appUserRepository.save(user);
+        User savedUser = userRepository.save(user);
         String token = jwtService.generateToken(savedUser);
 
         return buildAuthResponse(savedUser, token);
@@ -55,7 +56,7 @@ public class AuthService {
         }
 
         String email = normalizeEmail(request.email());
-        AppUser user = appUserRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
@@ -66,13 +67,13 @@ public class AuthService {
         return buildAuthResponse(user, token);
     }
 
-    private AuthResponse buildAuthResponse(AppUser user, String token) {
+    private AuthResponse buildAuthResponse(User user, String token) {
         return new AuthResponse(
                 token,
                 "Bearer",
                 user.getEmail(),
                 user.getFullName(),
-                user.getRole()
+                Role.valueOf(user.getRole().name())
         );
     }
 

@@ -32,7 +32,17 @@ public class FileUploadService {
     public UploadedFile uploadFile(MultipartFile file) throws IOException {
         String originalFileName = file.getOriginalFilename();
         String fileKey = UUID.randomUUID() + "-" + originalFileName;
+        UploadedFile uploadedFile = uploadFile(file, fileKey);
+        return uploadedFileRepository.save(uploadedFile);
+    }
 
+    public UploadedFile uploadFileWithoutSaving(MultipartFile file) throws IOException {
+        String originalFileName = file.getOriginalFilename();
+        String fileKey = UUID.randomUUID() + "-" + originalFileName;
+        return uploadFile(file, fileKey);
+    }
+
+    private UploadedFile uploadFile(MultipartFile file, String fileKey) throws IOException {
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(fileKey)
@@ -45,6 +55,7 @@ public class FileUploadService {
         );
 
         String fileUrl = publicUrl + "/" + fileKey;
+        String originalFileName = file.getOriginalFilename();
 
         UploadedFile uploadedFile = new UploadedFile();
         uploadedFile.setFileName(originalFileName);
@@ -52,6 +63,6 @@ public class FileUploadService {
         uploadedFile.setFileType(file.getContentType());
         uploadedFile.setFileSize(file.getSize());
 
-        return uploadedFileRepository.save(uploadedFile);
+        return uploadedFile;
     }
 }

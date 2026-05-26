@@ -1,6 +1,6 @@
 package com.smarthireai.service;
 
-import com.smarthireai.entity.AppUser;
+import com.smarthireai.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -24,7 +24,7 @@ public class JwtService {
         this.expirationMs = expirationMs;
     }
 
-    public String generateToken(AppUser user) {
+    public String generateToken(User user) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + expirationMs);
 
@@ -41,7 +41,7 @@ public class JwtService {
         return extractClaims(token).getSubject();
     }
 
-    public boolean isTokenValid(String token, AppUser user) {
+    public boolean isTokenValid(String token, User user) {
         Claims claims = extractClaims(token);
         return user.getEmail().equals(claims.getSubject()) && claims.getExpiration().after(new Date());
     }
