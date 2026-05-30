@@ -1,7 +1,7 @@
 package com.smarthireai.security;
 
-import com.smarthireai.entity.AppUser;
-import com.smarthireai.repository.AppUserRepository;
+import com.smarthireai.entity.User;
+import com.smarthireai.repository.UserRepository;
 import com.smarthireai.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,11 +19,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final AppUserRepository appUserRepository;
+    private final UserRepository userRepository;
 
-    public JwtAuthenticationFilter(JwtService jwtService, AppUserRepository appUserRepository) {
+    public JwtAuthenticationFilter(JwtService jwtService, UserRepository userRepository) {
         this.jwtService = jwtService;
-        this.appUserRepository = appUserRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String email = jwtService.extractEmail(token);
-            AppUser user = appUserRepository.findByEmail(email).orElse(null);
+            User user = userRepository.findByEmail(email).orElse(null);
 
             if (user != null && jwtService.isTokenValid(token, user)) {
                 UsernamePasswordAuthenticationToken authentication =

@@ -3,13 +3,15 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../config/api.config';
 
-export interface CandidateProfile {
+export interface CvVersion {
   id: number;
-  fullName: string;
-  email: string;
-  skills: string[];
-  experienceYears: number;
-  educationLevel: string;
+  fileName: string;
+  fileUrl: string;
+  fileType: string;
+  fileSize: number;
+  versionNumber: number;
+  active: boolean;
+  uploadedAt: string;
 }
 
 @Injectable({
@@ -17,9 +19,15 @@ export interface CandidateProfile {
 })
 export class CvService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${API_BASE_URL}/candidates`;
+  private readonly apiUrl = `${API_BASE_URL}/candidate/cvs`;
 
-  getCandidateProfile(): Observable<CandidateProfile> {
-    return this.http.get<CandidateProfile>(`${this.apiUrl}/me`);
+  getCvVersions(): Observable<CvVersion[]> {
+    return this.http.get<CvVersion[]>(this.apiUrl);
+  }
+
+  uploadCv(file: File): Observable<CvVersion> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<CvVersion>(this.apiUrl, formData);
   }
 }

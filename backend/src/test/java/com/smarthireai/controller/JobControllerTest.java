@@ -2,8 +2,8 @@ package com.smarthireai.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.smarthireai.repository.AppUserRepository;
 import com.smarthireai.repository.JobRepository;
+import com.smarthireai.repository.UserRepository;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -23,7 +23,7 @@ class JobControllerTest {
     private JobRepository jobRepository;
 
     @Autowired
-    private AppUserRepository appUserRepository;
+    private UserRepository userRepository;
 
     @LocalServerPort
     private int port;
@@ -31,7 +31,7 @@ class JobControllerTest {
     @AfterEach
     void tearDown() {
         jobRepository.deleteAll();
-        appUserRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -50,7 +50,14 @@ class JobControllerTest {
                           "company": "Smart Hire AI",
                           "requiredSkills": ["Java", "Spring"],
                           "minimumExperienceYears": 3,
-                          "educationLevel": "Bachelor"
+                          "educationLevel": "Bachelor",
+                          "location": "Casablanca, Morocco",
+                          "department": "Engineering",
+                          "employmentType": "Full-time",
+                          "workMode": "Hybrid",
+                          "salaryRange": "$45k - $65k",
+                          "applicationDeadline": "2026-07-15",
+                          "status": "Open"
                         }
                         """,
                 token
@@ -59,12 +66,17 @@ class JobControllerTest {
         assertThat(response.statusCode()).isEqualTo(201);
         assertThat(response.body()).contains("\"title\":\"Backend Engineer\"");
         assertThat(response.body()).contains("\"company\":\"Smart Hire AI\"");
+        assertThat(response.body()).contains("\"location\":\"Casablanca, Morocco\"");
+        assertThat(response.body()).contains("\"employmentType\":\"Full-time\"");
+        assertThat(response.body()).contains("\"workMode\":\"Hybrid\"");
+        assertThat(response.body()).contains("\"applicationDeadline\":\"2026-07-15\"");
         assertThat(response.body()).doesNotContain("recruiter");
 
         HttpResponse<String> jobsResponse = get("/api/jobs");
         assertThat(jobsResponse.statusCode()).isEqualTo(200);
         assertThat(jobsResponse.body()).contains("\"title\":\"Backend Engineer\"");
         assertThat(jobsResponse.body()).contains("\"company\":\"Smart Hire AI\"");
+        assertThat(jobsResponse.body()).contains("\"status\":\"Open\"");
     }
 
     @Test
@@ -83,7 +95,14 @@ class JobControllerTest {
                           "company": "Smart Hire AI",
                           "requiredSkills": ["Java", "Spring"],
                           "minimumExperienceYears": 3,
-                          "educationLevel": "Bachelor"
+                          "educationLevel": "Bachelor",
+                          "location": "Casablanca, Morocco",
+                          "department": "Engineering",
+                          "employmentType": "Full-time",
+                          "workMode": "Hybrid",
+                          "salaryRange": "$45k - $65k",
+                          "applicationDeadline": "2026-07-15",
+                          "status": "Open"
                         }
                         """,
                 token

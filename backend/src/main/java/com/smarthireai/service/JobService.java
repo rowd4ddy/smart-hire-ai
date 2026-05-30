@@ -1,11 +1,10 @@
 package com.smarthireai.service;
 
 import com.smarthireai.dto.CreateJobRequest;
-import com.smarthireai.entity.AppUser;
 import com.smarthireai.entity.Job;
-import com.smarthireai.entity.Role;
-import com.smarthireai.repository.AppUserRepository;
+import com.smarthireai.entity.User;
 import com.smarthireai.repository.JobRepository;
+import com.smarthireai.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -18,11 +17,11 @@ import org.springframework.web.server.ResponseStatusException;
 public class JobService {
 
     private final JobRepository jobRepository;
-    private final AppUserRepository appUserRepository;
+    private final UserRepository userRepository;
 
-    public JobService(JobRepository jobRepository, AppUserRepository appUserRepository) {
+    public JobService(JobRepository jobRepository, UserRepository userRepository) {
         this.jobRepository = jobRepository;
-        this.appUserRepository = appUserRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Job> getAllJobs() {
@@ -30,7 +29,7 @@ public class JobService {
     }
 
     public Job createJob(CreateJobRequest request) {
-        AppUser recruiter = getAuthenticatedRecruiter();
+        User recruiter = getAuthenticatedRecruiter();
         
         Job job = new Job(
                 recruiter,
@@ -38,13 +37,20 @@ public class JobService {
                 request.company(),
                 new ArrayList<>(request.requiredSkills() == null ? List.of() : request.requiredSkills()),
                 request.minimumExperienceYears(),
-                request.educationLevel()
+                request.educationLevel(),
+                request.location(),
+                request.department(),
+                request.employmentType(),
+                request.workMode(),
+                request.salaryRange(),
+                request.applicationDeadline(),
+                request.status() == null || request.status().isBlank() ? "Open" : request.status()
         );
 
         return jobRepository.save(job);
     }
 
-    private AppUser getAuthenticatedRecruiter() {
+    private User getAuthenticatedRecruiter() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -53,10 +59,10 @@ public class JobService {
 
         String email = authentication.getName();
 
-        AppUser recruiter = appUserRepository.findByEmail(email)
+        User recruiter = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authenticated user was not found"));
 
-        if (recruiter.getRole() != Role.RECRUITER) {
+        if (recruiter.getRole() != User.UserRole.RECRUITER) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Recruiter role is required");
         }
 

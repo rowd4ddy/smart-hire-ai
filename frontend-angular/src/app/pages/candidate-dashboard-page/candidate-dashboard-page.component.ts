@@ -2,8 +2,8 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { CvService, CvVersion } from '../../services/cv.service';
 import { Job, JobService } from '../../services/job.service';
-import { CandidateProfile, CvService } from '../../services/cv.service';
 
 @Component({
   selector: 'app-candidate-dashboard-page',
@@ -19,7 +19,11 @@ export class CandidateDashboardPageComponent implements OnInit {
   jobs = signal<Job[]>([]);
   isLoadingJobs = signal(true);
   jobsError = signal('');
-  profile = signal<CandidateProfile | null>(null);
+  cvVersions = signal<CvVersion[]>([]);
+  isLoadingCvs = signal(true);
+  isUploadingCv = signal(false);
+  selectedCvFile = signal<File | null>(null);
+  cvError = signal('');
 
   readonly recommendations = ['Improve Docker fundamentals', 'Complete Kubernetes basics', 'Review SQL optimization'];
 
@@ -52,15 +56,69 @@ export class CandidateDashboardPageComponent implements OnInit {
       }
     });
 
-    this.cvService.getCandidateProfile().subscribe({
-      next: (data) => this.profile.set(data),
-      error: () => {
-        // Candidate profile may not exist yet
-      }
-    });
+    this.loadCvVersions();
   }
 
   logout(): void {
     this.authService.logout();
+  }
+
+  get currentCv(): CvVersion | null {
+    return this.cvVersions().find((version) => version.active) ?? this.cvVersions()[0] ?? null;
+  }
+
+  onCvSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    this.cvError.set('');
+    this.selectedCvFile.set(file);
+  }
+
+  uploadSelectedCv(): void {
+    const file = this.selectedCvFile();
+
+    if (!file) {
+      this.cvError.set('Choose a PDF, DOC, or DOCX file first.');
+      return;
+    }
+
+    this.isUploadingCv.set(true);
+    this.cvError.set('');
+
+    this.cvService.uploadCv(file).subscribe({
+      next: (cvVersion) => {
+        this.cvVersions.update((versions) => [
+          cvVersion,
+          ...versions.map((version) => ({ ...version, active: false }))
+        ]);
+        this.selectedCvFile.set(null);
+        this.isUploadingCv.set(false);
+      },
+      error: (err) => {
+        this.cvError.set(err.error?.message ?? 'Failed to upload CV. Please try again.');
+        this.isUploadingCv.set(false);
+      }
+    });
+  }
+
+  formatFileSize(size: number): string {
+    if (size < 1024 * 1024) {
+      return `${Math.max(1, Math.round(size / 1024))} KB`;
+    }
+
+    return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  private loadCvVersions(): void {
+    this.cvService.getCvVersions().subscribe({
+      next: (versions) => {
+        this.cvVersions.set(versions);
+        this.isLoadingCvs.set(false);
+      },
+      error: () => {
+        this.cvError.set('Failed to load CV versions.');
+        this.isLoadingCvs.set(false);
+      }
+    });
   }
 }
