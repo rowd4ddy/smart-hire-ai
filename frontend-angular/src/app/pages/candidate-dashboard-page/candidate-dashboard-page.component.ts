@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { CvService, CvVersion } from '../../services/cv.service';
+import { CandidateProfile, CvService, CvVersion } from '../../services/cv.service';
 import { Job, JobService } from '../../services/job.service';
 
 @Component({
@@ -19,6 +19,7 @@ export class CandidateDashboardPageComponent implements OnInit {
   jobs = signal<Job[]>([]);
   isLoadingJobs = signal(true);
   jobsError = signal('');
+  profile = signal<CandidateProfile | null>(null);
   cvVersions = signal<CvVersion[]>([]);
   isLoadingCvs = signal(true);
   isUploadingCv = signal(false);
@@ -56,6 +57,7 @@ export class CandidateDashboardPageComponent implements OnInit {
       }
     });
 
+    this.loadCandidateProfile();
     this.loadCvVersions();
   }
 
@@ -107,6 +109,15 @@ export class CandidateDashboardPageComponent implements OnInit {
     }
 
     return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  private loadCandidateProfile(): void {
+    this.cvService.getCandidateProfile().subscribe({
+      next: (data) => this.profile.set(data),
+      error: () => {
+        // Candidate profile may not exist yet.
+      }
+    });
   }
 
   private loadCvVersions(): void {

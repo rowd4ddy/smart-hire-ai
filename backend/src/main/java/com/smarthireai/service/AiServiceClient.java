@@ -22,7 +22,7 @@ public class AiServiceClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${ai.service.url}")
+    @Value("${ai.service.url:http://localhost:8000}")
     private String aiServiceUrl;
 
     public CvParseResult parseCv(byte[] pdfBytes, String fileName) {

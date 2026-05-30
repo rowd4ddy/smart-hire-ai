@@ -14,13 +14,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -45,17 +41,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = authorizationHeader.substring(7);
 
-        log.debug("Authorization header present, token length={}", token == null ? 0 : token.length());
         try {
             String email = jwtService.extractEmail(token);
-            log.debug("Extracted email from token: {}", email);
             User user = userRepository.findByEmail(email).orElse(null);
-            log.debug("User lookup result: {}", user == null ? "null" : user.getEmail());
 
-            boolean valid = (user != null) && jwtService.isTokenValid(token, user);
-            log.debug("Token valid: {}", valid);
-
-            if (valid) {
+            if (user != null && jwtService.isTokenValid(token, user)) {
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 user.getEmail(),
@@ -64,10 +54,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         );
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.debug("Authentication set for user: {}", user.getEmail());
             }
-        } catch (Exception e) {
-            log.warn("Failed to authenticate token: {}", e.toString());
+        } catch (Exception ignored) {
             SecurityContextHolder.clearContext();
         }
 

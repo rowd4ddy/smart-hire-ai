@@ -5,6 +5,8 @@ import com.smarthireai.dto.LoginRequest;
 import com.smarthireai.dto.RegisterRequest;
 import com.smarthireai.entity.Role;
 import com.smarthireai.entity.User;
+import com.smarthireai.entity.AppUser;
+import com.smarthireai.repository.AppUserRepository;
 import com.smarthireai.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,15 +19,18 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final AppUserRepository appUserRepository;
 
     public AuthService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
-            JwtService jwtService
+            JwtService jwtService,
+            AppUserRepository appUserRepository
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.appUserRepository = appUserRepository;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -45,6 +50,11 @@ public class AuthService {
         );
 
         User savedUser = userRepository.save(user);
+
+        // create corresponding AppUser record for domain usage
+        AppUser appUser = new AppUser(savedUser.getFullName(), savedUser.getEmail(), savedUser.getPassword(), Role.valueOf(savedUser.getRole().name()));
+        appUserRepository.save(appUser);
+
         String token = jwtService.generateToken(savedUser);
 
         return buildAuthResponse(savedUser, token);
