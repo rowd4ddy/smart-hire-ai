@@ -20,6 +20,20 @@ export interface CreateJobPayload {
   educationLevel: string;
 }
 
+export interface RankedCandidate {
+  candidateId: number;
+  fullName: string;
+  email: string;
+  skills: string[];
+  experienceYears: number;
+  educationLevel: string;
+  finalScore: number;
+  skillsScore: number;
+  experienceScore: number;
+  educationScore: number;
+  missingSkills: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -29,6 +43,10 @@ export class JobService {
 
   getJobs(): Observable<Job[]> {
     return this.http.get<Job[]>(this.apiUrl);
+  }
+
+  getRankedCandidates(jobId: number): Observable<RankedCandidate[]> {
+    return this.http.get<RankedCandidate[]>(`${this.apiUrl}/${jobId}/ranked-candidates`);
   }
 
   createJob(payload: CreateJobPayload): Observable<Job> {

@@ -38,18 +38,48 @@
         <div class="rounded-[24px] border border-[#EBEBF0] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
           <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-accent">CV Status</div>
           <div class="mt-4 text-sm text-[#606078]">
-            <p class="mb-2">No CV uploaded yet.</p>
-            <p class="text-xs text-[#9898A8]">CV upload feature coming soon.</p>
+            @if (!profile()) {
+              <p class="mb-2">No CV parsed yet.</p>
+              <p class="text-xs text-[#9898A8]">Upload a CV to extract skills, experience, and education automatically.</p>
+            }
+            @if (profile()) {
+              <p class="mb-2">Your latest CV has been parsed.</p>
+              <p class="text-xs text-[#9898A8]">Keep your profile up to date by uploading new versions.</p>
+            }
           </div>
         </div>
 
-        <!-- Skills placeholder -->
+        <!-- Extracted skills -->
         <div class="rounded-[24px] border border-[#EBEBF0] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
-          <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-accent">Skills</div>
-          <div class="mt-4 text-sm text-[#606078]">
-            <p>Add your skills to get better job recommendations.</p>
-            <p class="mt-2 text-xs text-[#9898A8]">Skills management coming soon.</p>
-          </div>
+          <div class="text-[11px] font-bold uppercase tracking-[0.14em] text-accent">Extracted skills</div>
+
+          @if (!profile()) {
+            <p class="mt-4 text-sm text-[#606078]">Upload a CV to extract your skills automatically.</p>
+          }
+
+          @if (profile() && profile()!.skills.length === 0) {
+            <p class="mt-4 text-sm text-[#606078]">No skills detected yet. Try uploading a more detailed CV.</p>
+          }
+
+          @if (profile() && profile()!.skills.length > 0) {
+            <div class="mt-4 flex flex-wrap gap-2">
+              @for (skill of profile()!.skills; track skill) {
+                <span class="rounded-full border border-[#E0DFFF] bg-[#F5F3FF] px-3 py-1 text-[11.5px] font-medium text-accent">
+                  {{ skill }}
+                </span>
+              }
+            </div>
+            <div class="mt-4 grid grid-cols-2 gap-3 text-sm text-[#606078]">
+              <div>
+                <span class="font-semibold text-[#0D0D14]">Experience:</span>
+                {{ profile()!.experienceYears }}y
+              </div>
+              <div>
+                <span class="font-semibold text-[#0D0D14]">Education:</span>
+                {{ profile()!.educationLevel }}
+              </div>
+            </div>
+          }
         </div>
 
       </div>

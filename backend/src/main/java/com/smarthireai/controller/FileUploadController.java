@@ -1,7 +1,7 @@
 package com.smarthireai.controller;
 
 import com.smarthireai.entity.UploadedFile;
-import com.smarthireai.service.FileUploadService;
+import com.smarthireai.service.CvService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,15 +14,15 @@ import java.util.Map;
 @RequestMapping("/api/files")
 public class FileUploadController {
 
-    private final FileUploadService fileUploadService;
+    private final CvService cvService;
 
-    public FileUploadController(FileUploadService fileUploadService) {
-        this.fileUploadService = fileUploadService;
+    public FileUploadController(CvService cvService) {
+        this.cvService = cvService;
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
-        UploadedFile uploadedFile = fileUploadService.uploadFile(file);
+        UploadedFile uploadedFile = cvService.uploadCv(file);
 
         return ResponseEntity.ok(Map.of(
                 "id", uploadedFile.getId(),

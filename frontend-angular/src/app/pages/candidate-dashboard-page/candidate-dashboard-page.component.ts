@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { Job, JobService } from '../../services/job.service';
+import { CandidateProfile, CvService } from '../../services/cv.service';
 
 @Component({
   selector: 'app-candidate-dashboard-page',
@@ -13,10 +14,12 @@ import { Job, JobService } from '../../services/job.service';
 export class CandidateDashboardPageComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly jobService = inject(JobService);
+  private readonly cvService = inject(CvService);
 
   jobs = signal<Job[]>([]);
   isLoadingJobs = signal(true);
   jobsError = signal('');
+  profile = signal<CandidateProfile | null>(null);
 
   readonly recommendations = ['Improve Docker fundamentals', 'Complete Kubernetes basics', 'Review SQL optimization'];
 
@@ -46,6 +49,13 @@ export class CandidateDashboardPageComponent implements OnInit {
       error: () => {
         this.jobsError.set('Failed to load recommended jobs.');
         this.isLoadingJobs.set(false);
+      }
+    });
+
+    this.cvService.getCandidateProfile().subscribe({
+      next: (data) => this.profile.set(data),
+      error: () => {
+        // Candidate profile may not exist yet
       }
     });
   }

@@ -4,6 +4,7 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,12 +24,12 @@ public class Candidate {
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true)
-    private User user;
+    private AppUser user;
 
     private Integer experienceYears;
     private String educationLevel;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "candidate_skills", joinColumns = @JoinColumn(name = "candidate_id"))
     @Column(name = "skill")
     private List<String> skills = new ArrayList<>();
@@ -36,7 +37,7 @@ public class Candidate {
     public Candidate() {
     }
 
-    public Candidate(User user, List<String> skills, Integer experienceYears, String educationLevel) {
+    public Candidate(AppUser user, List<String> skills, Integer experienceYears, String educationLevel) {
         this.user = user;
         this.skills = skills;
         this.experienceYears = experienceYears;
@@ -47,11 +48,11 @@ public class Candidate {
         return id;
     }
 
-    public User getUser() {
+    public AppUser getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(AppUser user) {
         this.user = user;
     }
 

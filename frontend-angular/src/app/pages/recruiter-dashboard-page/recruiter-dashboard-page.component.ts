@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { Job, JobService } from '../../services/job.service';
+import { Job, JobService, RankedCandidate } from '../../services/job.service';
 
 @Component({
   selector: 'app-recruiter-dashboard-page',
@@ -17,6 +17,9 @@ export class RecruiterDashboardPageComponent implements OnInit {
   jobs = signal<Job[]>([]);
   isLoadingJobs = signal(true);
   jobsError = signal('');
+  rankedCandidates = signal<RankedCandidate[]>([]);
+  isLoadingCandidates = signal(false);
+  selectedJobId = signal<number | null>(null);
 
   readonly mockCandidates = [
     { name: 'Nadia Amrani', initials: 'NA', score: 92, skills: 'Java, Spring Boot' },
@@ -42,8 +45,33 @@ export class RecruiterDashboardPageComponent implements OnInit {
     });
   }
 
+  selectJob(jobId: number): void {
+    this.selectedJobId.set(jobId);
+    this.isLoadingCandidates.set(true);
+    this.jobService.getRankedCandidates(jobId).subscribe({
+      next: (data) => {
+        this.rankedCandidates.set(data);
+        this.isLoadingCandidates.set(false);
+      },
+      error: () => {
+        this.isLoadingCandidates.set(false);
+      }
+    });
+  }
+
   logout(): void {
     this.authService.logout();
+  }
+
+  getCandidateInitials(fullName: string): string {
+    if (!fullName) {
+      return '?';
+    }
+    return fullName
+      .split(' ')
+      .filter((part) => part.length > 0)
+      .map((part) => part[0])
+      .join('');
   }
 
   getScoreColor(score: number): string {
